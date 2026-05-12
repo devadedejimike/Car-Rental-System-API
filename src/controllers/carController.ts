@@ -36,3 +36,22 @@ export const getCars = async (req: Request, res: Response) => {
         console.log("Error fetching cars: ", error)
     }
 }
+
+// Get Single Car
+export const getACar = async (req: Request, res: Response) => {
+    try {
+        const car = await Car.findById(req.params.id);
+        res.status(200).json({
+            status: 'Success',
+            car,
+            message: 'Fetched a Single Car Successfully'
+        })
+    } catch (error) {
+        res.status(404).json({
+            status: 'Fail',
+            message: 'Cannot fetch note of the provided id',
+            error
+        })
+        console.log("Error Fetchng A Single Car: ", error)
+    }
+}
