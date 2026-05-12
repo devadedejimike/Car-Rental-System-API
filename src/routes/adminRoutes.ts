@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { createCar } from "../controllers/carController";
+import { createCar, getCars } from "../controllers/carController";
 
 const router = Router();
 
 router
-    .post('/create', createCar);
+    .post('/create', createCar)
+    .get('/cars', getCars)
 
 
 export default router
