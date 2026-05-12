@@ -55,3 +55,24 @@ export const getACar = async (req: Request, res: Response) => {
         console.log("Error Fetchng A Single Car: ", error)
     }
 }
+
+// Update Car
+export const UpdateCar = async (req: Request, res: Response) => {
+    try {
+        const car = await Car.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
+        res.status(200).json({
+            status: 'Success',
+            car,
+            message: 'Car Details Updated Successfully'
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'Fail',
+            message: 'Error Updating Car Details',
+            error
+        })
+        console.log("Error Updating Car Details",error)
+    }
+}
+
+// Delete Car
