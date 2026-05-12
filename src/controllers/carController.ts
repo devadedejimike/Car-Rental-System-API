@@ -76,3 +76,19 @@ export const UpdateCar = async (req: Request, res: Response) => {
 }
 
 // Delete Car
+export const deleteCar = async (req: Request, res: Response) => {
+    try {
+        await Car.findByIdAndDelete(req.params.id)
+        res.status(200).json({
+            status: 'Success',
+            data: null,
+            message: 'Car Deleted Successfully'
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'Success',
+            message: 'Error Deleting Car'
+        })
+        console.log('Error Deleting Car: ', error)
+    }
+}
