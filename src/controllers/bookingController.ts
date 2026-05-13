@@ -82,3 +82,21 @@ export const getAllBooking = async (req: Request, res: Response) => {
     }
 }
 // Get All User's booking
+export const getUserBooking = async (req: AuthRequest, res: Response) => {
+    try {
+        const booking = await Booking.find({user: req.user!.id}).sort({createdAt: -1});
+        res.status(200).json({
+            status: 'Success',
+            length: booking.length,
+            booking,
+            message: 'All User Bookings Fetched Successfully'
+        })
+    } catch (error) {
+        console.log("Error Fetching All User Bookings: ", error)
+        res.status(400).json({
+            status: 'Fail',
+            message: 'Error Fetching All User Bookings',
+            error
+        })
+    }
+}
