@@ -100,3 +100,38 @@ export const getUserBooking = async (req: AuthRequest, res: Response) => {
         })
     }
 }
+// Approve Bookings 
+export const ApproveBooking = async (req: AuthRequest, res: Response) => {
+    try {
+        const booking = await Booking.findById(req.params.id)
+        // Check if project exist
+        if(!booking){
+            return res.status(404).json({
+                status: 'Fail',
+                message: 'Booking Not Found'
+            })
+        }
+        // Check if Booking is approved already
+        if(booking.status === 'approved'){
+            return res.status(400).json({
+                status: 'Fail',
+                message: 'Booking Approved Already'
+            })
+        }
+        // Approve Booking
+        booking.status = 'approved'
+        await booking.save()
+        res.status(200).json({
+            status: 'Success',
+            booking,
+            message: 'Booking Approved Successfully'
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: 'Fail',
+            message: 'Error Approving Booking',
+            error
+        })
+        console.log("Error Approving Booking", error)
+    }
+}
