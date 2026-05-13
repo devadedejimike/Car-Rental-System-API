@@ -135,3 +135,38 @@ export const ApproveBooking = async (req: AuthRequest, res: Response) => {
         console.log("Error Approving Booking", error)
     }
 }
+// Cancel Booking
+export const CancelBooking = async (req: AuthRequest, res: Response) => {
+    try {
+        const booking =  await Booking.findById(req.params.id)
+        // check if booking exist
+        if(!booking){
+            return res.status(404).json({
+                status: 'Fail',
+                message: 'Booking Not Found'
+            })
+        }
+        // Check if booking is cancelled already
+        if(booking.status === 'cancelled'){
+            return res.status(400).json({
+                status: 'Fail',
+                message: 'Booking Cancalled Already'
+            })
+        }
+        // Cancel Booking
+        booking.status = 'cancelled'
+        await booking.save()
+        res.status(200).json({
+            status: 'Success',
+            booking,
+            message: 'Booking Cancelled Successfully'
+        })
+    } catch (error) {
+        console.log('Error Cancelling Booking', error)
+        res.status(400).json({
+            status: 'Fail',
+            message: 'Error Cancelling Booking',
+            error
+        })
+    }
+}
