@@ -2,7 +2,7 @@ import { Router } from "express";
 import { createCar, deleteCar, getCars, UpdateCar } from "../controllers/carController";
 import { protect } from "../middleware/protect";
 import { isAdmin } from "../middleware/adminMiddleware";
-import { ApproveBooking, getAllBooking } from "../controllers/bookingController";
+import { ApproveBooking, CancelBooking, getAllBooking } from "../controllers/bookingController";
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router
     .delete('/cars/:id', protect, isAdmin, deleteCar)
     .get('/booking', protect, isAdmin, getAllBooking)
     .patch('/booking/:id/approve', protect, isAdmin, ApproveBooking )
+    .patch('/booking/:id/cancel', protect, isAdmin, CancelBooking)
 
 export default router
