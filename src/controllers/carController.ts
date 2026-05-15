@@ -21,9 +21,9 @@ export const createCar = async (req: Request, res: Response) => {
 export const getCars = async (req: Request, res: Response) => {
     try {
         const car = await Car.find()
-        res.status(201).json({
+        res.status(200).json({
             status: 'Success',
-            lenght: car.length,
+            length: car.length,
             car,
             message: 'Fetch Cars Successfull'
         })
