@@ -65,7 +65,9 @@ export const CreateBooking = async (req: AuthRequest, res: Response) => {
 // Get All Bookings
 export const getAllBooking = async (req: Request, res: Response) => {
     try {
-        const booking = await Booking.find();
+        const booking = await Booking.find()
+            .populate("car")
+            .populate("user")
         res.status(200).json({
             status: 'Success',
             length: booking.length,
@@ -84,7 +86,9 @@ export const getAllBooking = async (req: Request, res: Response) => {
 // Get All User's booking
 export const getUserBooking = async (req: AuthRequest, res: Response) => {
     try {
-        const booking = await Booking.find({user: req.user!.id}).sort({createdAt: -1});
+        const booking = await Booking.find({user: req.user!.id})
+            .populate("car")
+            .sort({createdAt: -1});
         res.status(200).json({
             status: 'Success',
             length: booking.length,
@@ -170,3 +174,47 @@ export const CancelBooking = async (req: AuthRequest, res: Response) => {
         })
     }
 }
+
+// Stats for Admin Dashboard
+export const getDashboardStats = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const totalCars = await Car.countDocuments();
+
+    const totalBookings =
+      await Booking.countDocuments();
+
+    const approved =
+      await Booking.countDocuments({
+        status: "approved",
+      });
+
+    const pending =
+      await Booking.countDocuments({
+        status: "pending",
+      });
+
+    const cancelled =
+      await Booking.countDocuments({
+        status: "cancelled",
+      });
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalCars,
+        totalBookings,
+        approved,
+        pending,
+        cancelled,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to load dashboard stats",
+    });
+  }
+};
