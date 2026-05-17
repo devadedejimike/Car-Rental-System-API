@@ -1,21 +1,36 @@
 import { Request, Response } from "express";
 import Car from "../models/carModel"
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 
 // Create Car
 export const createCar = async (req: Request, res: Response) => {
-    try {
-        const car = await Car.create(req.body);
-        res.status(201).json({
-            status: 'Success',
-            car,
-            message: 'New Car Created Successfully'
-        })
-    } catch (error) {
-        res.status(400).json({message: 'Error Creating Car'})
-        console.log("Error creating cars: ", error)
+  try {
+    let image = "";
+
+    if (req.file) {
+      const result: any = await uploadToCloudinary(req.file.buffer);
+      image = result.secure_url;
+    } else {
+      return res.status(400).json({ status: "Fail", message: "Car image is required" });
     }
-}
+
+    const car = await Car.create({
+      ...req.body,
+      image,
+    });
+
+    res.status(201).json({
+      status: "Success",
+      car,
+      message: "New Car Created Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ status: "Fail", message: "Error Creating Car", error });
+  }
+};
+
 
 // Get All Cars
 export const getCars = async (req: Request, res: Response) => {
@@ -58,23 +73,40 @@ export const getACar = async (req: Request, res: Response) => {
 
 // Update Car
 export const UpdateCar = async (req: Request, res: Response) => {
-    try {
-        const car = await Car.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
-        res.status(200).json({
-            status: 'Success',
-            car,
-            message: 'Car Details Updated Successfully'
-        })
-    } catch (error) {
-        res.status(400).json({
-            status: 'Fail',
-            message: 'Error Updating Car Details',
-            error
-        })
-        console.log("Error Updating Car Details",error)
+  try {
+    const updatedData = { ...req.body };
+    if (req.file) {
+      const result: any = await uploadToCloudinary(req.file.buffer);
+      updatedData.image = result.secure_url;
     }
-}
 
+    const car = await Car.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!car) {
+      return res.status(404).json({ status: "Fail", message: "Car not found" });
+    }
+
+    res.status(200).json({
+      status: "Success",
+      car,
+      message: "Car Details Updated Successfully",
+    });
+  } catch (error) {
+    console.log("Error Updating Car Details", error);
+    res.status(400).json({
+      status: "Fail",
+      message: "Error Updating Car Details",
+      error,
+    });
+  }
+};
 // Delete Car
 export const deleteCar = async (req: Request, res: Response) => {
     try {
