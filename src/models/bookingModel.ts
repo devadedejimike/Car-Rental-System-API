@@ -8,7 +8,7 @@ export interface IBooking extends Document{
     startDate: Date,
     endDate: Date,
     totalPrice: number,
-    status: "pending" |"approved" | "cancelled"
+    status: "pending" |"approved" | "cancelled" | "paid" | "completed"
 }
 
 const bookingSchema = new Schema<IBooking>(
@@ -37,7 +37,7 @@ const bookingSchema = new Schema<IBooking>(
         },
         status: {
             type: String,
-            enum: ["pending", "approved", "cancelled"],
+            enum: ["pending", "approved", "cancelled", "paid", "completed"],
             default: "pending"
         } 
     }, { timestamps: true }
