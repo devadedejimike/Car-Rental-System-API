@@ -218,3 +218,32 @@ export const getDashboardStats = async (
     });
   }
 };
+
+// Accept Payment
+export const confirmPayment = async (req: AuthRequest, res: Response) => {
+    try {
+        const booking = await Booking.findById(req.params.id)
+        // check if booking exist
+        if(!booking){
+            return res.status(404).json({message: "Booking Not Found"})
+        }
+        // check if payment has been confirmed already
+        if(booking.status === "paid"){
+            return res.status(400).json({message: "Payment Confirmed Already"})
+        }
+
+        booking.status = "paid"
+        await booking.save()
+        res.status(200).json({
+            status: 'success',
+            booking,
+            message: "Booking Payment Confirmed Successfully"
+        })
+    } catch (error) {
+        console.log('Error Confirming Payment', error)
+        res.status(400).json({
+            status: 'fail',
+            message: 'Error Confirming Payment',
+        }) 
+    }
+}
