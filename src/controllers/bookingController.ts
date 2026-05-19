@@ -125,6 +125,13 @@ export const ApproveBooking = async (req: AuthRequest, res: Response) => {
         // Approve Booking
         booking.status = 'approved'
         await booking.save()
+
+        // Change car availbility status to false
+        const car = await Car.findById(booking.car)
+        if(car){
+            car.available = false
+            await car.save();
+        }
         res.status(200).json({
             status: 'Success',
             booking,
