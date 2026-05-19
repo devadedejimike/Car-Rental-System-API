@@ -247,3 +247,32 @@ export const confirmPayment = async (req: AuthRequest, res: Response) => {
         }) 
     }
 }
+
+// Booking Completed when car is returned
+export const completeBooking = async (req: AuthRequest, res: Response) => {
+    try {
+        const booking = await Booking.findById(req.params.id)
+        // check if booking exist
+        if(!booking) {
+            return res.status(404).json({message: "Booking Not Found"})
+        }
+        // Check if booking is set to completed already
+        if(booking.status === 'completed'){
+            return res.status(400).json({message: "Booking Completed Already"})
+        }
+        booking.status = 'completed'
+        await booking.save();
+        res.status(200).json({
+            status: 'success',
+            booking,
+            message: 'Booking Completed Successfully'
+        })
+    } catch (error) {
+        console.log('Error Completing Booking', error)
+        res.status(400).json({
+            status: 'fail',
+            message: 'Error Completing Booking',
+            error
+        })
+    }
+}
