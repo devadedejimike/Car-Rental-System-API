@@ -167,6 +167,13 @@ export const CancelBooking = async (req: AuthRequest, res: Response) => {
         // Cancel Booking
         booking.status = 'cancelled'
         await booking.save()
+
+        // Change car availbility status to true
+        const car = await Car.findById(booking.car)
+        if(car){
+            car.available = true
+            await car.save();
+        }
         res.status(200).json({
             status: 'Success',
             booking,
