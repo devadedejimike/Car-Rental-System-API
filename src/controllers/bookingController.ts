@@ -262,6 +262,13 @@ export const completeBooking = async (req: AuthRequest, res: Response) => {
         }
         booking.status = 'completed'
         await booking.save();
+
+        // Return car availbility status to true
+        const car = await Car.findById(booking.car)
+        if(car){
+            car.available = true
+            await car.save();
+        }
         res.status(200).json({
             status: 'success',
             booking,
