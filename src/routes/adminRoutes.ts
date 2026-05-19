@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { createCar, deleteCar, getCars, UpdateCar } from "../controllers/carController";
-import { ApproveBooking, CancelBooking, confirmPayment, getAllBooking, getDashboardStats } from "../controllers/bookingController";
+import { ApproveBooking, CancelBooking, completeBooking, confirmPayment, getAllBooking, getDashboardStats } from "../controllers/bookingController";
 import { protect } from "../middleware/protect";
 import { isAdmin } from "../middleware/adminMiddleware";
 
@@ -16,6 +16,7 @@ router
     .patch("/booking/:id/approve", protect,  isAdmin,  ApproveBooking)  
     .patch("/booking/:id/cancel", protect, isAdmin, CancelBooking)
     .patch("/booking/:id/pay", protect, isAdmin, confirmPayment)
+    .patch("/booking/:id/complete", protect, isAdmin, completeBooking)
     .get("/dashboard-stats", protect, isAdmin, getDashboardStats)
 
 export default router;
