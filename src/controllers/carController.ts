@@ -1,19 +1,20 @@
 import { Request, Response } from "express";
 import Car from "../models/carModel"
-import { uploadToCloudinary } from "../utils/uploadToCloudinary";
+// import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 
 // Create Car
 export const createCar = async (req: Request, res: Response) => {
   try {
-    let image = "";
-
-    if (req.file) {
-      const result: any = await uploadToCloudinary(req.file.buffer);
-      image = result.secure_url;
-    } else {
-      return res.status(400).json({ status: "Fail", message: "Car image is required" });
+    if (!req.file) {
+      return res.status(400).json({
+        status: "Fail",
+        message: "Car image is required",
+      });
     }
+
+    const image =
+      `${req.protocol}://${req.get("host")}/uploads/cars/${req.file.filename}`;
 
     const car = await Car.create({
       ...req.body,
@@ -23,11 +24,12 @@ export const createCar = async (req: Request, res: Response) => {
     res.status(201).json({
       status: "Success",
       car,
-      message: "New Car Created Successfully",
     });
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ status: "Fail", message: "Error Creating Car", error });
+    res.status(500).json({
+      status: "Fail",
+      error,
+    });
   }
 };
 
@@ -75,9 +77,10 @@ export const getACar = async (req: Request, res: Response) => {
 export const UpdateCar = async (req: Request, res: Response) => {
   try {
     const updatedData = { ...req.body };
+
     if (req.file) {
-      const result: any = await uploadToCloudinary(req.file.buffer);
-      updatedData.image = result.secure_url;
+      updatedData.image =
+        `${req.protocol}://${req.get("host")}/uploads/cars/${req.file.filename}`;
     }
 
     const car = await Car.findByIdAndUpdate(
@@ -90,19 +93,19 @@ export const UpdateCar = async (req: Request, res: Response) => {
     );
 
     if (!car) {
-      return res.status(404).json({ status: "Fail", message: "Car not found" });
+      return res.status(404).json({
+        status: "Fail",
+        message: "Car not found",
+      });
     }
 
-    res.status(200).json({
+    res.json({
       status: "Success",
       car,
-      message: "Car Details Updated Successfully",
     });
   } catch (error) {
-    console.log("Error Updating Car Details", error);
-    res.status(400).json({
+    res.status(500).json({
       status: "Fail",
-      message: "Error Updating Car Details",
       error,
     });
   }
@@ -124,3 +127,17 @@ export const deleteCar = async (req: Request, res: Response) => {
         console.log('Error Deleting Car: ', error)
     }
 }
+export const uploadCarImage = async (req: Request,  res: Response) => {
+  if (!req.file) {
+    return res.status(400).json({
+      message: "No image uploaded",
+    });
+  }
+
+  const image =
+    `${req.protocol}://${req.get("host")}/uploads/cars/${req.file.filename}`;
+
+  res.json({
+    image,
+  });
+};
