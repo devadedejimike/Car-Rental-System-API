@@ -8,7 +8,7 @@ import upload from "../config/multer";
 
 const router = Router();
 router
-    .post("/cars",protect, isAdmin, upload.single("image"), createCar)
+    .post("/cars", protect, isAdmin, upload.single("image"), createCar)
     .get("/cars", getCars)
     .put("/cars/:id", protect, isAdmin, upload.single("image"), UpdateCar)
     .delete("/cars/:id", protect, isAdmin, deleteCar)
