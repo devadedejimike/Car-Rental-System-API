@@ -68,6 +68,7 @@ export const getAllBooking = async (req: Request, res: Response) => {
         const booking = await Booking.find()
             .populate("car")
             .populate("user")
+            .sort({createdAt: -1})
         res.status(200).json({
             status: 'Success',
             length: booking.length,
@@ -125,6 +126,9 @@ export const ApproveBooking = async (req: AuthRequest, res: Response) => {
         // Approve Booking
         booking.status = 'approved'
         await booking.save()
+        const populatedBooking = await Booking.findById(booking._id)
+        .populate("user")
+        .populate("car");
 
         // Change car availbility status to false
         const car = await Car.findById(booking.car)
@@ -134,7 +138,7 @@ export const ApproveBooking = async (req: AuthRequest, res: Response) => {
         }
         res.status(200).json({
             status: 'Success',
-            booking,
+            booking: populatedBooking,
             message: 'Booking Approved Successfully'
         })
     } catch (error) {
@@ -168,6 +172,10 @@ export const CancelBooking = async (req: AuthRequest, res: Response) => {
         booking.status = 'cancelled'
         await booking.save()
 
+        const populatedBooking = await Booking.findById(booking._id)
+        .populate("user")
+        .populate("car");
+
         // Change car availbility status to true
         const car = await Car.findById(booking.car)
         if(car){
@@ -176,7 +184,7 @@ export const CancelBooking = async (req: AuthRequest, res: Response) => {
         }
         res.status(200).json({
             status: 'Success',
-            booking,
+            booking: populatedBooking,
             message: 'Booking Cancelled Successfully'
         })
     } catch (error) {
@@ -248,9 +256,13 @@ export const confirmPayment = async (req: AuthRequest, res: Response) => {
 
         booking.status = "paid"
         await booking.save()
+
+        const populatedBooking = await Booking.findById(booking._id)
+        .populate("user")
+        .populate("car");
         res.status(200).json({
             status: 'success',
-            booking,
+            booking: populatedBooking,
             message: "Booking Payment Confirmed Successfully"
         })
     } catch (error) {
@@ -277,6 +289,10 @@ export const completeBooking = async (req: AuthRequest, res: Response) => {
         booking.status = 'completed'
         await booking.save();
 
+        const populatedBooking = await Booking.findById(booking._id)
+            .populate("user")
+            .populate("car");
+
         // Return car availbility status to true
         const car = await Car.findById(booking.car)
         if(car){
@@ -285,7 +301,7 @@ export const completeBooking = async (req: AuthRequest, res: Response) => {
         }
         res.status(200).json({
             status: 'success',
-            booking,
+            booking: populatedBooking,
             message: 'Booking Completed Successfully'
         })
     } catch (error) {
